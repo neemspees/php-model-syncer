@@ -194,6 +194,31 @@ class SyncerTest extends TestCase
         $this->assertSync($expected, $actual);
     }
 
+    /** @test */
+    public function configuringAnAttributeWithACallbackWorks()
+    {
+        $left = [
+            new TestModel(1, 'Name 1', 'name1@test.test', 100),
+            new TestModel(2, 'Name 2', 'name2@test.test', 100)
+        ];
+        $right = [
+            new TestModel(1, 'Name 1', 'changed1@test.test', 50),
+            new TestModel(2, 'Name 2', 'changed2@test.test', 200)
+        ];
+        $expected = [
+            new TestModel(1, 'Name 1', 'name1@test.test', 100),
+            new TestModel(2, 'Name 2', 'changed2@test.test', 200)
+        ];
+
+        $preferLastUpdated = function ($a, $b) {
+            return $a->updatedAt >= $b->updatedAt ? -1 : 1;
+        };
+        $syncer = new Syncer();
+        $actual = $syncer->sync($left, $right, ['email' => $preferLastUpdated, 'updated_at' => $preferLastUpdated]);
+
+        $this->assertSync($expected, $actual);
+    }
+
     /**
      * @param array<SyncableInterface> $expected
      * @param array<SyncableInterface> $actual

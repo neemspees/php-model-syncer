@@ -61,7 +61,7 @@ class Syncer implements SyncerInterface
         $mergedProperties = $aProperties;
         $changedProperties = array_diff_assoc($aProperties, $bProperties);
         foreach ($changedProperties as $key => $value) {
-            if (array_key_exists($key, $config) && $this->hasFlag($config[$key], static::PREFER_ATTRIBUTE_LEFT)) {
+            if (array_key_exists($key, $config) && $this->isLeftPrefered($a, $b, $config[$key])) {
                 continue;
             }
             $mergedProperties[$key] = $bProperties[$key];
@@ -113,5 +113,23 @@ class Syncer implements SyncerInterface
     private function hasFlag($flags, $flag)
     {
         return ($flags & $flag) === $flag;
+    }
+
+    /**
+     * @param SyncableInterface $a
+     * @param SyncableInterface $b
+     * @param int|callable $configValue
+     *
+     * @return bool
+     */
+    private function isLeftPrefered($a, $b, $configValue)
+    {
+        if (is_integer($configValue)) {
+            return $this->hasFlag($configValue, static::PREFER_ATTRIBUTE_LEFT);
+        }
+        if (is_callable($configValue)) {
+            return $configValue($a, $b) === -1;
+        }
+        return false;
     }
 }
