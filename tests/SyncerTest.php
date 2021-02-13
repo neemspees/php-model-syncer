@@ -156,6 +156,44 @@ class SyncerTest extends TestCase
         $this->assertSync($expected, $actual);
     }
 
+    /** @test */
+    public function configuringAnAttributeToPreferLeftTakesTheLeftItemsValueForThatAttribute()
+    {
+        $left = [
+            new TestModel(2, 'Name2', 'name2@test.test')
+        ];
+        $right = [
+            new TestModel(2, 'Changed Name', 'changed@test.test')
+        ];
+        $expected = [
+            new TestModel(2, 'Changed Name', 'name2@test.test')
+        ];
+
+        $syncer = new Syncer();
+        $actual = $syncer->sync($left, $right, ['email' => Syncer::PREFER_ATTRIBUTE_LEFT]);
+
+        $this->assertSync($expected, $actual);
+    }
+
+    /** @test */
+    public function configuringAnAttributeToPreferRightTakesTheRightItemsValueForThatAttribute()
+    {
+        $left = [
+            new TestModel(2, 'Name2', 'name2@test.test')
+        ];
+        $right = [
+            new TestModel(2, 'Changed Name', 'changed@test.test')
+        ];
+        $expected = [
+            new TestModel(2, 'Changed Name', 'changed@test.test')
+        ];
+
+        $syncer = new Syncer();
+        $actual = $syncer->sync($left, $right, ['email' => Syncer::PREFER_ATTRIBUTE_RIGHT]);
+
+        $this->assertSync($expected, $actual);
+    }
+
     /**
      * @param array<SyncableInterface> $expected
      * @param array<SyncableInterface> $actual

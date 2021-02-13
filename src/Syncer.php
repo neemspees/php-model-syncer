@@ -16,7 +16,7 @@ class Syncer implements SyncerInterface
     {
         $temp = [];
         foreach ($this->getMatches($left, $right) as $match) {
-             $temp[] = $this->syncProperties($match->getLeft(), $match->getRight());
+             $temp[] = $this->syncProperties($match->getLeft(), $match->getRight(), $config);
         }
         if (!$this->hasFlag($flags, static::IGNORE_NEW_ITEMS_LEFT)) {
             $temp = $this->mergeMissing($temp, $left);
@@ -50,12 +50,22 @@ class Syncer implements SyncerInterface
     /**
      * @param SyncableInterface $a
      * @param SyncableInterface $b
+     * @param array<string,string> $config
      *
      * @return SyncableInterface
      */
-    private function syncProperties($a, $b)
+    private function syncProperties($a, $b, array $config = [])
     {
-        $mergedProperties = array_merge($a->getSyncableProperties(), $b->getSyncableProperties());
+        $aProperties = $a->getSyncableProperties();
+        $bProperties = $b->getSyncableProperties();
+        $mergedProperties = $aProperties;
+        $changedProperties = array_diff_assoc($aProperties, $bProperties);
+        foreach ($changedProperties as $key => $value) {
+            if (array_key_exists($key, $config) && $this->hasFlag($config[$key], static::PREFER_ATTRIBUTE_LEFT)) {
+                continue;
+            }
+            $mergedProperties[$key] = $bProperties[$key];
+        }
         $clone = clone $a;
         $clone->setSyncableProperties($mergedProperties);
         return $clone;
