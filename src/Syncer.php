@@ -18,8 +18,12 @@ class Syncer implements SyncerInterface
         foreach ($this->getMatches($left, $right) as $match) {
              $temp[] = $this->syncProperties($match->getLeft(), $match->getRight());
         }
-        $temp = $this->mergeMissing($temp, $left);
-        $temp = $this->mergeMissing($temp, $right);
+        if (!$this->hasFlag($flags, static::IGNORE_NEW_ITEMS_LEFT)) {
+            $temp = $this->mergeMissing($temp, $left);
+        }
+        if (!$this->hasFlag($flags, static::IGNORE_NEW_ITEMS_RIGHT)) {
+            $temp = $this->mergeMissing($temp, $right);
+        }
         return $temp;
     }
 
@@ -88,5 +92,16 @@ class Syncer implements SyncerInterface
             $target[] = $a;
         }
         return $target;
+    }
+
+    /**
+     * @param int $flags
+     * @param int $flag
+     *
+     * @return bool
+     */
+    private function hasFlag($flags, $flag)
+    {
+        return ($flags & $flag) === $flag;
     }
 }

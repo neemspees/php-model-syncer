@@ -6,6 +6,7 @@ interface SyncerInterface
 {
     const IGNORE_NEW_ITEMS_LEFT = 1;
     const IGNORE_NEW_ITEMS_RIGHT = 2;
+    const IGNORE_NEW_ITEMS_BOTH = 3;
 
     const PREFER_ATTRIBUTE_LEFT = 1;
     const PREFER_ATTRIBUTE_RIGHT = 2;

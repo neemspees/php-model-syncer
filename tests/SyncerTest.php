@@ -62,10 +62,96 @@ class SyncerTest extends TestCase
         $expected = [
             new TestModel(1, 'Name1', 'name1@test.test'),
             new TestModel(2, 'Name2', 'changed@test.test')
-        ];;
+        ];
 
         $syncer = new Syncer();
         $actual = $syncer->sync($left, $right);
+
+        $this->assertSync($expected, $actual);
+    }
+
+    /** @test */
+    public function applyingTheIgnoreNewLeftFlagIgnoresItemsThatAreNotInRight()
+    {
+        $left = [
+            new TestModel(1, 'Name1', 'name1@test.test'),
+            new TestModel(2, 'Name2', 'name2@test.test')
+        ];
+        $right = [
+            new TestModel(2, 'Name2', 'changed@test.test'),
+            new TestModel(3, 'Name3', 'name3@test.test')
+        ];
+        $expected = [
+            new TestModel(2, 'Name2', 'changed@test.test'),
+            new TestModel(3, 'Name3', 'name3@test.test')
+        ];
+
+        $syncer = new Syncer();
+        $actual = $syncer->sync($left, $right, [], Syncer::IGNORE_NEW_ITEMS_LEFT);
+
+        $this->assertSync($expected, $actual);
+    }
+
+    /** @test */
+    public function applyingTheIgnoreNewRightFlagIgnoresItemsThatAreNotInLeft()
+    {
+        $left = [
+            new TestModel(2, 'Name2', 'name2@test.test'),
+            new TestModel(3, 'Name3', 'name3@test.test')
+        ];
+        $right = [
+            new TestModel(1, 'Name1', 'name1@test.test'),
+            new TestModel(2, 'Name2', 'changed@test.test')
+        ];
+        $expected = [
+            new TestModel(2, 'Name2', 'changed@test.test'),
+            new TestModel(3, 'Name3', 'name3@test.test')
+        ];
+
+        $syncer = new Syncer();
+        $actual = $syncer->sync($left, $right, [], Syncer::IGNORE_NEW_ITEMS_RIGHT);
+
+        $this->assertSync($expected, $actual);
+    }
+
+    /** @test */
+    public function applyingTheIgnoreNewLeftAndIgnoreNewRightFlagsIgnoresItemsThatAreNotInBoth()
+    {
+        $left = [
+            new TestModel(1, 'Name1', 'name1@test.test'),
+            new TestModel(2, 'Name2', 'name2@test.test')
+        ];
+        $right = [
+            new TestModel(2, 'Name2', 'changed@test.test'),
+            new TestModel(3, 'Name3', 'name3@test.test')
+        ];
+        $expected = [
+            new TestModel(2, 'Name2', 'changed@test.test')
+        ];
+
+        $syncer = new Syncer();
+        $actual = $syncer->sync($left, $right, [], Syncer::IGNORE_NEW_ITEMS_LEFT | Syncer::IGNORE_NEW_ITEMS_RIGHT);
+
+        $this->assertSync($expected, $actual);
+    }
+
+    /** @test */
+    public function applyingTheIgnoreBothFlagIgnoresItemsThatAreNotInBoth()
+    {
+        $left = [
+            new TestModel(1, 'Name1', 'name1@test.test'),
+            new TestModel(2, 'Name2', 'name2@test.test')
+        ];
+        $right = [
+            new TestModel(2, 'Name2', 'changed@test.test'),
+            new TestModel(3, 'Name3', 'name3@test.test')
+        ];
+        $expected = [
+            new TestModel(2, 'Name2', 'changed@test.test')
+        ];
+
+        $syncer = new Syncer();
+        $actual = $syncer->sync($left, $right, [], Syncer::IGNORE_NEW_ITEMS_BOTH);
 
         $this->assertSync($expected, $actual);
     }
