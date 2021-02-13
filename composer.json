@@ -1,11 +1,11 @@
 {
-    "name": "keypress/syncer",
-    "description": "Syncer",
+    "name": "neemspees/model-syncer",
+    "description": "A model syncer",
     "type": "library",
     "authors": [
         {
             "name": "Kim Bouchouaram",
-            "email": "kim@keypress.be"
+            "email": "mcleonell@gmail.com"
         }
     ],
     "require": {
